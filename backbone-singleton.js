@@ -1,40 +1,77 @@
 /*global $:true, Backbone:true, _:true */
 
-Backbone.singleton = function(Model, opt){
-  opt = opt || {};
-
-  var hash = opt.hash || Model.hash || function(attr, modelOpt){
-      var idAttribute = Model.prototype.idAttribute;
-      return attr && attr[idAttribute];
-    };
-
-  var hashFail = opt.hashFail || Model.hashFail || function(attr, modelOpt){
-      return new Model(attr, modelOpt);
-    };
-
-  var SingletonModel = function(attr, modelOpt){
-    var key = hash(attr, modelOpt);
-
-    if(!key){
-      return hashFail(attr, modelOpt);
-    }
-
-    if(this.store[key]){
-      this.store[key].set(attr, modelOpt);
-    }else{
-      this.store[key] = new Model(attr, modelOpt);
-    }
-
-    return this.store[key];
+(function(){
+  var SingletonModel = function(){
+    Backbone.Model.apply(this, arguments);
+    return this.capture();
   };
 
-  var F = function(){};
-  F.prototype = Model;
-  SingletonModel.prototype = new F();
-  _.extend(SingletonModel, Model);
+  SingletonModel.prototype = Backbone.Model.prototype;
 
-  SingletonModel.prototype.store = {};
+  SingletonModel.prototype._singleton = {
+    store: {},
+    counts: {}
+  };
+
+  SingletonModel.prototype.hash = function(){
+    return this.id;
+  };
+
+  SingletonModel.prototype.capture = function(){
+    var meta = this._singleton;
+    
+    var hash = this.hash();
+    if(!hash){
+      this.singleton = false;
+      return;
+    }
+    
+    var model = meta.store[hash];
+    if(model){
+      meta.counts[hash] ++;
+      model.set(this.attributes);
+      return model;
+    }
+
+    meta.store[hash] = this;
+    meta.counts[hash] = 1;
+    this.singleton = true;
+    return this;
+  };
+
+  SingletonModel.prototype.release = function(){
+    if(!this.singleton){return;}
+    var meta = this._singleton;
+    var hash = this.hash();
+    meta.counts[hash] --;
+  };
+
+
+  //Class methods
+  _.extend(SingletonModel, Backbone.Model);
+
+  SingletonModel.extend = function(){
+    var child = Backbone.Model.extend.apply(this, arguments);
+    child.prototype._singleton = {
+      store:{},
+      counts:{}
+    };
+    return child;
+  };
+
+  SingletonModel.reap = function(){
+    //delete all models with counts === 0;
+    var meta = this.prototype._singleton;
+    _.forEach(meta.counts,function(count, hash){
+      if(count < 1){
+        delete meta.store[hash];
+        delete meta.counts[hash];
+      }
+    });
+  };
+
+
+  Backbone.SingletonModel = SingletonModel;
   
-  return SingletonModel;
-};
+}());
 
