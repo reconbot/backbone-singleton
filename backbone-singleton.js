@@ -1,13 +1,16 @@
 /*global Backbone:true, _:true */
 
-(function(){
+(function(Backbone){
+
+  var Model = Backbone.Model;
+
   var SingletonModel = function(){
     // bad form! why are we ALWAYS creating a model?
-    Backbone.Model.apply(this, arguments);
+    Model.apply(this, arguments);
     return this.capture();
   };
 
-  SingletonModel.prototype = Backbone.Model.prototype;
+  SingletonModel.prototype = Model.prototype;
 
   SingletonModel.prototype._singleton = {
     store: {},
@@ -53,10 +56,10 @@
 
 
   //Class methods
-  _.extend(SingletonModel, Backbone.Model);
+  _.extend(SingletonModel, Model);
 
   SingletonModel.extend = function(){
-    var child = Backbone.Model.extend.apply(this, arguments);
+    var child = Model.extend.apply(this, arguments);
     child.prototype._singleton = {
       store:{},
       counts:{}
@@ -78,5 +81,5 @@
 
   Backbone.SingletonModel = SingletonModel;
 
-}());
+}(Backbone));
 
