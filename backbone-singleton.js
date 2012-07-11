@@ -1,7 +1,8 @@
-/*global $:true, Backbone:true, _:true */
+/*global Backbone:true, _:true */
 
 (function(){
   var SingletonModel = function(){
+    // bad form! why are we ALWAYS creating a model?
     Backbone.Model.apply(this, arguments);
     return this.capture();
   };
@@ -21,12 +22,16 @@
     var meta = this._singleton;
     
     var hash = this.hash();
-    if(!hash){
+    if(typeof hash === 'undefined'){
       this.singleton = false;
       return;
     }
     
     var model = meta.store[hash];
+    if(model === this){
+      return this;
+    }
+
     if(model){
       meta.counts[hash] ++;
       model.set(this.attributes);
@@ -72,6 +77,6 @@
 
 
   Backbone.SingletonModel = SingletonModel;
-  
+
 }());
 
