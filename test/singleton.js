@@ -1,5 +1,5 @@
-/*global $:true, Backbone:true, _:true, module:true, proxy:true, test:true, equals: true,  ok:true, deepEqual: true */
-/*
+/*global $:true, Backbone:true, _:true, module:true, proxy:true, test:true, equal: true,  ok:true, deepEqual: true, notEqual: true*/
+
 $(document).ready(function() {
 
   module("Backbone.SingletonModel");
@@ -20,9 +20,9 @@ $(document).ready(function() {
     stuff: 2
   };
 
-  test("SingletonModel: extend", function() {
+  test("SingletonModel: init", function() {
     var model = new Backbone.SingletonModel(attrs);
-    deepEqual(model.toJSON(), attrs);
+    deepEqual(model.attributes, attrs, 'initialize a new model');
   });
 
 
@@ -35,7 +35,7 @@ $(document).ready(function() {
     });
 
     var model = new Model(attrs, opts);
-    deepEqual(model.toJSON(), attrs);
+    deepEqual(model.attributes, attrs, 'attributes are retrievable');
   });
 
   test("SingletonModel: singleton test", function() {
@@ -43,8 +43,17 @@ $(document).ready(function() {
 
     var a = new SingletonModel(attrs);
     var b = new SingletonModel(attrs);
-    equals(a, b, 'two Models with the same key are the same model');
+    equal(a, b, 'two Models with the same key are the same model');
+  });
+
+  test("SingletonModel: subclass stores", function() {
+    var SingletonModel = Backbone.SingletonModel;
+    var CoolModel = SingletonModel.extend({});
+
+    var a = new SingletonModel(attrs);
+    var b = new CoolModel(attrs);
+    notEqual(a, b, "subclasses dont share models");
+    notEqual(a._singleton.store, b._singleton.store, "subclasses don't share stores");
   });
 
 });
-*/
