@@ -1,34 +1,40 @@
-var makeStoreable = function(model){
-  var StoreModel = function(attr, opt){
-    if(!attr || !attr.id){
-      // The behavior you exhibit here is up to you
-      throw new Error('Cool Models always have IDs!');
+/*global $:true, Backbone:true, _:true */
+
+Backbone.singleton = function(Model, opt){
+  opt = opt || {};
+
+  var hash = opt.hash || Model.hash || function(attr, modelOpt){
+      var idAttribute = Model.prototype.idAttribute;
+      return attr && attr[idAttribute];
+    };
+
+  var hashFail = opt.hashFail || Model.hashFail || function(attr, modelOpt){
+      return new Model(attr, modelOpt);
+    };
+
+  var SingletonModel = function(attr, modelOpt){
+    var key = hash(attr, modelOpt);
+
+    if(!key){
+      return hashFail(attr, modelOpt);
     }
-    if(this.store[attr.id]){
-      this.store[attr.id].set(attr, opt);
+
+    if(this.store[key]){
+      this.store[key].set(attr, modelOpt);
     }else{
-      var newModel = new model(attr, opt);
-      this.store[attr.id] = newModel;
+      this.store[key] = new Model(attr, modelOpt);
     }
-    return this.store[attr.id];
+
+    return this.store[key];
   };
-  StoreModel.prototype.store = {};
-  return StoreModel;
+
+  var F = function(){};
+  F.prototype = Model;
+  SingletonModel.prototype = new F();
+  _.extend(SingletonModel, Model);
+
+  SingletonModel.prototype.store = {};
+  
+  return SingletonModel;
 };
 
-var CoolModel = Backbone.Model.extend({});
-
-CoolModel = makeStoreable(CoolModel);
-
-var a = new CoolModel({
-    id: 4,
-    coolFactor: 'LOW'
-});
-
-var b = new CoolModel({
-    id:4,
-    coolFactor: 'HIGH'
-});
-
-console.log(a===b); //true!
-console.log(a.get('coolFactor') === 'HIGH'); //true!
