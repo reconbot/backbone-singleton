@@ -22,6 +22,5 @@ To use me - just extend me
   var CoolModel = Backbone.SingletonModel.extend({});
 
 TODO:
-  Stop always creating models!
-    I like how hash() always a model to work with but it's bad form to consturct something and then toss it away
+  Test custom Hash's
   More tests

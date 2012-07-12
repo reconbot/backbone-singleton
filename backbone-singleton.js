@@ -5,9 +5,8 @@
   var Model = Backbone.Model;
 
   var SingletonModel = function(){
-    // bad form! why are we ALWAYS creating a model?
-    Model.apply(this, arguments);
-    return this.capture();
+    var model = this.capture.apply(this, arguments);
+    return model || Model.apply(this, arguments);
   };
 
   SingletonModel.prototype = Model.prototype;
@@ -17,14 +16,16 @@
     counts: {}
   };
 
-  SingletonModel.prototype.hash = function(){
-    return this.id;
+  SingletonModel.prototype.hash = function(attr){
+    attr = attr || {};
+    var idAttr = this.idAttribute || 'id';
+    return this.id || attr[idAttr];
   };
 
   SingletonModel.prototype.capture = function(){
     var meta = this._singleton;
     
-    var hash = this.hash();
+    var hash = this.hash.apply(this, arguments);
     if(typeof hash === 'undefined'){
       this.singleton = false;
       return;
@@ -37,14 +38,14 @@
 
     if(model){
       meta.counts[hash] ++;
-      model.set(this.attributes);
+      model.set.apply(model, arguments);
       return model;
     }
 
     meta.store[hash] = this;
     meta.counts[hash] = 1;
     this.singleton = true;
-    return this;
+    return;
   };
 
   SingletonModel.prototype.release = function(){

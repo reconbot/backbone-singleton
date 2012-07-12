@@ -43,7 +43,7 @@ $(document).ready(function() {
 
     var a = new SingletonModel(attrs);
     var b = new SingletonModel(attrs);
-    equal(a, b, 'two Models with the same key are the same model');
+    deepEqual(a, b, 'two Models with the same key are the same model');
   });
 
   test("SingletonModel: subclass stores", function() {
@@ -56,4 +56,54 @@ $(document).ready(function() {
     notEqual(a._singleton.store, b._singleton.store, "subclasses don't share stores");
   });
 
+  test("SingletonModel: update on new", function() {
+    var CoolModel = Backbone.SingletonModel.extend({});
+
+    var data = {
+      id: 'bob',
+      data: 'classy!'
+    };
+
+    var a = new CoolModel({
+      id: 'bob'
+    });
+    var b = new CoolModel(data);
+    deepEqual(a, b, "Models are the same");
+    deepEqual(a.attributes, data, "Attributes were updated");
+  });
+
+  test("SingletonModel: idAttribute", function() {
+    var CoolModel = Backbone.SingletonModel.extend({
+      idAttribute: 'key'
+    });
+
+    var data = {
+      key: 'bob',
+      data: 'classy!'
+    };
+
+    var a = new CoolModel({
+      key: 'bob'
+    });
+    var b = new CoolModel(data);
+
+    deepEqual(a, b, "Models are pulled by their idAttribute");
+    deepEqual(b.attributes, data, "Attributes are updated");
+    deepEqual(a.attributes, data, "Attributes are updated");
+  });
+
+  test("SingletonModel: capture - new model", function() {
+    var CoolModel = Backbone.SingletonModel.extend({});
+
+    var data = {
+      respectlevel: 'classy!'
+    };
+
+    var a = new CoolModel(data);
+
+    equal(a.singleton, false, 'Model not a singleton');
+    a.set({id:1});
+    a.capture();
+    equal(a.singleton, true, "Capture was successful");
+  });
 });
