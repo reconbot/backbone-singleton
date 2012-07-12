@@ -1,7 +1,7 @@
 /*global $:true, Backbone:true, _:true, module:true, proxy:true, test:true, equal: true,  ok:true, deepEqual: true, notEqual: true*/
 $(document).ready(function() {
 
-  module("Backbone.Model");
+  module("Backbone.Model - SingletonModel replaced");
 
   // Variable to catch the last request.
   window.lastRequest = null;
@@ -13,7 +13,9 @@ $(document).ready(function() {
     lastRequest = _.toArray(arguments);
   };
 
-  Backbone.Model = Backbone.SingletonModel;
+  // this will be fun
+  Backbone.OldModel = Backbone.Model;
+  Backbone.Model = Backbone.SingletonModel.extend({});
 
   var attrs = {
     id     : '1-the-tempest',
