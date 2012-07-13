@@ -1,6 +1,8 @@
 Backbone Singleton
 Backbone singleton can be used to keep a cache of all your models. If new models are created that are the same as your existing models you'll get a reference to your origional model and it's data will be updated. This allows for some cool patterns but comes with few caveats with long lived pages as your models will never be garbage collected without some intervention.
 
+Backbone singleton is tested with backbone's own model tests. It passes. It is also tested with a small suite of tests to ensure the singleton pattern. It passes that too.
+
 To use me - just extend me (not required but it's recommended)
   var CoolModel = Backbone.SingletonModel.extend({});
   var a = new CoolModel({id: 4, coolLevel: "low"});
