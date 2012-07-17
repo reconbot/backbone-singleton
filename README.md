@@ -14,10 +14,10 @@ Backbone singleton is tested with backbone's own model tests. It passes. It is a
 ```
 
 ## Inspiration
-http://backstage.soundcloud.com/2012/06/building-the-next-soundcloud/
-http://stackoverflow.com/questions/11145159/implement-javascript-instance-store-by-returning-existing-instance-from
+- http://backstage.soundcloud.com/2012/06/building-the-next-soundcloud/
+- http://stackoverflow.com/questions/11145159/implement-javascript-instance-store-by-returning-existing-instance-from
 
-## Nitty Gritty
+## API
 
 ### We define three instance methods
 
