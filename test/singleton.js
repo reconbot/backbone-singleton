@@ -30,6 +30,7 @@ $(document).ready(function() {
     var Model = Backbone.SingletonModel.extend({
       initialize: function(atr,opt) {
         deepEqual(this.attributes, attrs, 'attributes are assigned');
+	ok(this.attributes !== attrs, 'attributes are cloned');
         deepEqual(opt, opts, 'options are passed');
       }
     });
@@ -49,26 +50,35 @@ $(document).ready(function() {
   test("SingletonModel: subclass stores", function() {
     var SingletonModel = Backbone.SingletonModel;
     var CoolModel = SingletonModel.extend({});
+    var AwesomeModel = SingletonModel.extend({});
 
     var a = new SingletonModel(attrs);
     var b = new CoolModel(attrs);
-    notEqual(a, b, "subclasses dont share models");
-    notEqual(a._singleton.store, b._singleton.store, "subclasses don't share stores");
+    var c = new AwesomeModel(attrs);
+    notEqual(a, b, "Parent Class doesn't share models with children");
+    notEqual(b, c, "Subclasss don't share models with eachother");
+    notEqual(a._singleton.store, b._singleton.store, "Parents don't share stores with children");
+    notEqual(b._singleton.store, c._singleton.store, "subclasses don't share stores");
+    notEqual(SingletonModel.prototype._singleton, CoolModel.prototype._singleton, "Prototypes of children don't share meta class with parent");
+    notEqual(CoolModel.prototype._singleton, AwesomeModel.prototype._singleton, "Prototypes of subclasses don't share meta class");
   });
 
   test("SingletonModel: update on new", function() {
     var CoolModel = Backbone.SingletonModel.extend({});
+
+    var a = new CoolModel({
+      id: 'bob'
+    });
 
     var data = {
       id: 'bob',
       data: 'classy!'
     };
 
-    var a = new CoolModel({
-      id: 'bob'
-    });
     var b = new CoolModel(data);
-    deepEqual(a, b, "Models are the same");
+
+    equal(a.cid,b.cid, "Model client ids are the same");
+    deepEqual(a,b, "Models are the same");
     deepEqual(a.attributes, data, "Attributes were updated");
   });
 

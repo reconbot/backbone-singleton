@@ -59,8 +59,11 @@
   //Class methods
   _.extend(SingletonModel, Model);
 
-  SingletonModel.extend = function(){
-    var child = Model.extend.apply(this, arguments);
+  SingletonModel.extend = function(protoProps, staticProps){
+    if(_.isObject(protoProps)){
+      protoProps.constructor = SingletonModel
+    }
+    var child = Model.extend.call(this, protoProps, staticProps);
     child.prototype._singleton = {
       store:{},
       counts:{}
