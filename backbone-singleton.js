@@ -60,9 +60,15 @@
   _.extend(SingletonModel, Model);
 
   SingletonModel.extend = function(protoProps, staticProps){
+    var parent = this;
+    var constructor = function(){ return parent.apply(this, arguments); };
+
     if(_.isObject(protoProps)){
-      protoProps.constructor = SingletonModel
+      protoProps.constructor = constructor
+    }else{
+      protoProps = { constructor : constructor };
     }
+
     var child = Model.extend.call(this, protoProps, staticProps);
     child.prototype._singleton = {
       store:{},
