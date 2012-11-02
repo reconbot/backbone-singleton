@@ -40,7 +40,7 @@ $(document).ready(function() {
   });
 
   test("SingletonModel: singleton test", function() {
-    var SingletonModel = Backbone.SingletonModel;
+    var SingletonModel = Backbone.SingletonModel.extend({});
 
     var a = new SingletonModel(attrs);
     var b = new SingletonModel(attrs);
