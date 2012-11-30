@@ -53,4 +53,3 @@ Backbone singleton is tested with backbone's own model tests. It passes. It is a
 
 ##TODO:
 - Test custom Hash's
-- More tests
